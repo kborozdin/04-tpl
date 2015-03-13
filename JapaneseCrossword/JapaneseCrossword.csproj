@@ -64,6 +64,7 @@
     <Compile Include="CrosswordSolver.cs" />
     <Compile Include="CrosswordSolverTests.cs" />
     <Compile Include="ICrosswordSolver.cs" />
+    <Compile Include="IterationResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SolutionStatus.cs" />

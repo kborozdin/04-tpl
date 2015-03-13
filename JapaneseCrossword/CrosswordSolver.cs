@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 
 //GLOBAL TODO : refactor into separate classes
 
@@ -25,7 +26,7 @@ namespace JapaneseCrossword
 
 		private int[][] ParseDimension(string[] lines, int shift)
 		{
-			int count = ParseNumberAfterColon(lines[0]);
+			int count = ParseNumberAfterColon(lines[shift]);
 			return Enumerable
 				.Range(0, count)
 				.Select(i => ParseNumbersDelimitedBySpaces(lines[shift + 1 + i]))
@@ -37,6 +38,7 @@ namespace JapaneseCrossword
 			var lines = File.ReadAllLines(filePath);
 			rowBlocks = ParseDimension(lines, 0);
 			columnBlocks = ParseDimension(lines, rowBlocks.Length + 1);
+			picture = new CellState[rowBlocks.Length, columnBlocks.Length];
 		}
 
 		private CellState[] GetRow(int row)
@@ -81,16 +83,38 @@ namespace JapaneseCrossword
 			return any;
 		}
 
-		private bool CanPlaceBlock(CellState states[], int left, int right)
+		private bool IsFullyColored(int[] prefixSum, int left, int right)
 		{
-			//TODO
+			int length = right - left + 1;
+			if (length <= 0)
+				return true;
+			int sum = prefixSum[right] - (left > 0 ? prefixSum[left - 1] : 0);
+			return sum == length;
+		}
+
+		private int[] CalculatePrefixSum(CellState[] states, Func<CellState, bool> isGood)
+		{
+			int length = states.Length;
+			var prefixSum = new int[length];
+
+			for (int i = 0; i < length; i++)
+			{
+				if (i > 0)
+					prefixSum[i] = prefixSum[i - 1];
+				if (isGood(states[i]))
+					prefixSum[i]++;
+			}
+
+			return prefixSum;
 		}
 
 		private bool CheckLineCorectness(int[] blocks, CellState[] states)
 		{
-			//FUNC TODO : complete function
 			int length = states.Length;
 			int count = blocks.Length;
+
+			var prefixSumWhite = CalculatePrefixSum(states, c => c != CellState.Black);
+			var prefixSumBlack = CalculatePrefixSum(states, c => c != CellState.White);
 
 			//dynamic programming : covered first A cells using first B blocks
 			bool[,] possible = new bool[length + 1, count + 1];
@@ -103,23 +127,33 @@ namespace JapaneseCrossword
 					if (!possible[i, j])
 						continue;
 
-					possible[i + 1, j] = true;
+					if (IsFullyColored(prefixSumWhite, i, i))
+						possible[i + 1, j] = true;
 
 					if (j == count)
 						continue;
 
-					for (int shift = blocks[j] + 1; i + shift <= length; shift++)
+					int space = (j == count - 1 ? 0 : 1);
+
+					for (int pos = i; pos + blocks[j] + space <= length; pos++)
 					{
-						//TODO check indices
-						if (CanPlaceBlock(states, i + shift - blocks[j] - 1, i + shift - 1))
-							possible[i + shift, j + 1] = true;
+						if (IsFullyColored(prefixSumWhite, i, pos - 1) &&
+							IsFullyColored(prefixSumBlack, pos, pos + blocks[j] - 1) &&
+							IsFullyColored(prefixSumWhite, pos + blocks[j], pos + blocks[j] + space - 1))
+						{
+							possible[pos + blocks[j] + space, j + 1] = true;
+						}
 					}
 				}
 			}
+
+			return possible[length, count];
 		}
 
 		private CellState[] UpdateLine(int[] blocks, CellState[] states)
 		{
+			if (!CheckLineCorectness(blocks, states))
+				return null;
 			int length = states.Length;
 
 			for (int i = 0; i < length; i++)
@@ -134,9 +168,8 @@ namespace JapaneseCrossword
 				bool canBeBlack = CheckLineCorectness(blocks, states);
 
 				if (canBeBlack && canBeWhite)
-					continue;
-
-				if (canBeBlack)
+					states[i] = CellState.Unknown;
+				else if (canBeBlack)
 					states[i] = CellState.Black;
 				else if (canBeWhite)
 					states[i] = CellState.White;
@@ -189,13 +222,37 @@ namespace JapaneseCrossword
 					any = true;
 
 				var columnsResult = UpdateDimension(columnBlocks, GetColumn, SetColumn);
-				if (rowsResult == IterationResult.Failed)
+				if (columnsResult == IterationResult.Failed)
 					return SolutionStatus.IncorrectCrossword;
-				if (rowsResult == IterationResult.Changed)
+				if (columnsResult == IterationResult.Changed)
 					any = true;
 			}
 
 			return IsFullySolved() ? SolutionStatus.Solved : SolutionStatus.PartiallySolved;
+		}
+
+		private void WriteFile(string filePath)
+		{
+			var mapping = new Dictionary<CellState, char>
+			{
+				{CellState.Unknown, '?'},
+				{CellState.White, '.'},
+				{CellState.Black, '*'}
+			};
+			int height = picture.GetLength(0);
+			int width = picture.GetLength(1);
+
+			using (var file = new StreamWriter(filePath))
+			{
+				for (int i = 0; i < height; i++)
+				{
+					file.WriteLine(
+						string.Join("",
+						Enumerable
+						.Range(0, width)
+						.Select(j => mapping[picture[i, j]])));
+				}
+			}
 		}
 
         public SolutionStatus Solve(string inputFilePath, string outputFilePath)
@@ -210,6 +267,21 @@ namespace JapaneseCrossword
 			}
 
 			var status = SolveCrossword();
+
+			if (status == SolutionStatus.PartiallySolved ||
+				status == SolutionStatus.Solved)
+			{
+				try
+				{
+					WriteFile(outputFilePath);
+				}
+				catch (Exception) //TODO : bad practice maybe
+				{
+					return SolutionStatus.BadOutputFilePath;
+				}
+			}
+
+			return status;
         }
     }
 }
