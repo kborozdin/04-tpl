@@ -6,10 +6,8 @@ namespace JapaneseCrossword
     {
         static void Main(string[] args)
         {
-			/*
 			var solver = new CrosswordSolver();
-			Console.WriteLine(solver.Solve("../../SampleInput.txt", "../../res.txt"));
-			*/
+			Console.WriteLine(solver.Solve("../../SampleInput.txt", "../../res.txt"));	
         }
     }
 }

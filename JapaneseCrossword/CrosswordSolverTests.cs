@@ -72,6 +72,7 @@ namespace JapaneseCrossword
             CollectionAssert.AreEqual(File.ReadAllText(correctOutputFilePath), File.ReadAllText(outputFilePath));
         }
 
+		/*
         [Test]
         public void Winter()
         {
@@ -82,5 +83,6 @@ namespace JapaneseCrossword
             Assert.AreEqual(SolutionStatus.PartiallySolved, solutionStatus);
             CollectionAssert.AreEqual(File.ReadAllText(correctOutputFilePath), File.ReadAllText(outputFilePath));
         }
+		*/
     }
 }
