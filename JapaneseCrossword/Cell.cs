@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JapaneseCrossword
 {
-	class Cell
+	public class Cell
 	{
 		public CellState State { get; set; }
 		public bool JustChanged { get; set; }

@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace JapaneseCrossword
 {
-	public enum CellState
+	public interface IDimensionUpdater
 	{
-		Unknown,
-		White,
-		Black
+		bool Update(int[][] dimensionBlocks, Func<int, Cell[]> get);
 	}
 }

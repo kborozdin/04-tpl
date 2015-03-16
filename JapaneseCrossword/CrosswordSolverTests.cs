@@ -11,7 +11,10 @@ namespace JapaneseCrossword
         [TestFixtureSetUp]
         public void SetUp()
         {
-            solver = new CrosswordSolver();
+			var lineCorrectnessChecker = new LineCorrectnessChecker();
+			var lineUpdater = new LineUpdater(lineCorrectnessChecker);
+			var dimensionUpdater = new MultiThreadDimensionUpdater(lineUpdater);
+			solver = new CrosswordSolver(dimensionUpdater);
         }
 
         [Test]
@@ -88,10 +91,8 @@ namespace JapaneseCrossword
 		{
 			var inputFilePath = @"TestFiles\SuperBig.txt";
 			var outputFilePath = Path.GetRandomFileName();
-			//var correctOutputFilePath = @"TestFiles\Winter.solved.txt";
 			var solutionStatus = solver.Solve(inputFilePath, outputFilePath);
 			Assert.AreEqual(SolutionStatus.Solved, solutionStatus);
-			//CollectionAssert.AreEqual(File.ReadAllText(correctOutputFilePath), File.ReadAllText(outputFilePath));
 		}
     }
 }

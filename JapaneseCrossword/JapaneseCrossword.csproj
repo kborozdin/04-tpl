@@ -61,10 +61,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cell.cs" />
+    <Compile Include="CellArrayExtensions.cs" />
     <Compile Include="CellState.cs" />
+    <Compile Include="CrosswordReader.cs" />
     <Compile Include="CrosswordSolver.cs" />
     <Compile Include="CrosswordSolverTests.cs" />
+    <Compile Include="CrosswordWriter.cs" />
     <Compile Include="ICrosswordSolver.cs" />
+    <Compile Include="IDimensionUpdater.cs" />
+    <Compile Include="LineCorrectnessChecker.cs" />
+    <Compile Include="LineUpdater.cs" />
+    <Compile Include="MultiThreadDimensionUpdater.cs" />
+    <Compile Include="OneThreadDimensionUpdater.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SolutionStatus.cs" />
