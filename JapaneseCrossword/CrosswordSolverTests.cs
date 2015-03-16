@@ -72,17 +72,26 @@ namespace JapaneseCrossword
             CollectionAssert.AreEqual(File.ReadAllText(correctOutputFilePath), File.ReadAllText(outputFilePath));
         }
 
-		/*
         [Test]
         public void Winter()
         {
             var inputFilePath = @"TestFiles\Winter.txt";
             var outputFilePath = Path.GetRandomFileName();
-            var correctOutputFilePath = @"TestFiles\Winter.solved.txt";
+            //var correctOutputFilePath = @"TestFiles\Winter.solved.txt";
             var solutionStatus = solver.Solve(inputFilePath, outputFilePath);
-            Assert.AreEqual(SolutionStatus.PartiallySolved, solutionStatus);
-            CollectionAssert.AreEqual(File.ReadAllText(correctOutputFilePath), File.ReadAllText(outputFilePath));
+            Assert.AreEqual(SolutionStatus.Solved, solutionStatus);
+            //CollectionAssert.AreEqual(File.ReadAllText(correctOutputFilePath), File.ReadAllText(outputFilePath));
         }
-		*/
+
+		[Test]
+		public void SuperBig()
+		{
+			var inputFilePath = @"TestFiles\SuperBig.txt";
+			var outputFilePath = Path.GetRandomFileName();
+			//var correctOutputFilePath = @"TestFiles\Winter.solved.txt";
+			var solutionStatus = solver.Solve(inputFilePath, outputFilePath);
+			Assert.AreEqual(SolutionStatus.Solved, solutionStatus);
+			//CollectionAssert.AreEqual(File.ReadAllText(correctOutputFilePath), File.ReadAllText(outputFilePath));
+		}
     }
 }

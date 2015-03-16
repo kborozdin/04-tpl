@@ -115,14 +115,12 @@ namespace JapaneseCrossword
 						continue;
 
 					int space = (j == count - 1 ? 0 : 1);
-
-					for (int pos = i; pos + blocks[j] + space <= length; pos++)
+					if (i + blocks[j] + space <= length)
 					{
-						if (IsFullyColored(prefixSumWhite, i, pos - 1) &&
-							IsFullyColored(prefixSumBlack, pos, pos + blocks[j] - 1) &&
-							IsFullyColored(prefixSumWhite, pos + blocks[j], pos + blocks[j] + space - 1))
+						if (IsFullyColored(prefixSumBlack, i, i + blocks[j] - 1) &&
+							IsFullyColored(prefixSumWhite, i + blocks[j], i + blocks[j] + space - 1))
 						{
-							possible[pos + blocks[j] + space, j + 1] = true;
+							possible[i + blocks[j] + space, j + 1] = true;
 						}
 					}
 				}
@@ -255,16 +253,19 @@ namespace JapaneseCrossword
 						found = true;
 
 						picture[i, j].State = CellState.White;
+						picture[i, j].JustChanged = true;
 						var result = SolveCrosswordBruteforce();
 						if (result == SolutionStatus.Solved)
 							return result;
 
 						picture[i, j].State = CellState.Black;
+						picture[i, j].JustChanged = true;
 						result = SolveCrosswordBruteforce();
 						if (result == SolutionStatus.Solved)
 							return result;
 
 						picture[i, j].State = CellState.Unknown;
+						picture[i, j].JustChanged = false;
 					}
 
 			return SolutionStatus.IncorrectCrossword;
