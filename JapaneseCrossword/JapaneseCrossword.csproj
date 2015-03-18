@@ -65,6 +65,8 @@
     <Compile Include="CellState.cs" />
     <Compile Include="CrosswordReader.cs" />
     <Compile Include="CrosswordSolver.cs" />
+    <Compile Include="CrosswordSolverMultiThreadTests.cs" />
+    <Compile Include="CrosswordSolverOneThreadTests.cs" />
     <Compile Include="CrosswordSolverTests.cs" />
     <Compile Include="CrosswordWriter.cs" />
     <Compile Include="ICrosswordSolver.cs" />
